@@ -289,7 +289,7 @@ def patch_file_cleanup(file_suffix, recovery_file, fairphone_build_date):
     # _ = input('User: Press Enter when Fairphone has booted to normal mode')
     normal_boot_mode = False
     while normal_boot_mode == False:
-        sleep(30)
+        sleep(20)
         normal_boot_mode = check_if_in_normal_boot_mode()
 
     magisk_file = f'/storage/emulated/0/Download/magisk_patched-{file_suffix}.img'
