@@ -1,8 +1,16 @@
-import argparse, hashlib, os, re, subprocess, sys
 from datetime import datetime
+import hashlib, os, re, subprocess, sys
 from threading import Thread
 from time import sleep
-from url_check import url_check
+
+
+def read_config_file(self_directory):
+    from configparser import ConfigParser
+    config_file = os.path.join(self_directory, 'configurations.ini')
+    config = ConfigParser()
+    config.read(config_file)
+
+    return(config)
 
 
 def only_one_phone():
@@ -65,7 +73,7 @@ def check_directory(magisk_directory):
     directory_check = os.path.isdir(magisk_directory)
 
     if directory_check == False:
-        sys.exit(f'Cannot reach directory {directory_check}')
+        sys.exit(f'Cannot reach directory {magisk_directory}')
 
     os.chdir(magisk_directory)
 
@@ -306,10 +314,15 @@ def patch_file_cleanup(file_suffix, recovery_file, fairphone_build_date):
 
 if __name__ == '__main__':
 
-    sys.path.append('/home/gurpreet/git')
-    from LogWriter import LogWriter
+    self_directory = os.path.split(__file__)[0]
+    sys.path.append(os.path.split(self_directory)[0])
 
-    working_directory = '/home/gurpreet/Downloads/lineageos/'
+    from LogWriter import LogWriter
+    from url_check.url_check import url_check
+
+    config = read_config_file(self_directory)
+
+    working_directory = config['client']['working_directory']
 
     check_directory(working_directory)
 
