@@ -55,15 +55,20 @@ def available_builds(fairphone_build):
     html_response = url_check(base_url, logger)
 
     table_of_links = html_response.html.find('tbody', first = True)
-    latest_build_row = table_of_links.find('tr', first = True)
+    build_rows = table_of_links.find('tr')
 
-    latest_build_date_cell = latest_build_row.find('td')[-1]
-    latest_build_date = datetime.strptime(latest_build_date_cell.text, '%Y-%m-%d').date()
+    for build_row in build_rows:
+        build_date_cells = build_row.find('td')[-1]
+        build_date = datetime.strptime(build_date_cells.text, '%Y-%m-%d').date()
 
-    logger.info(f'Found recovery for: {latest_build_date}')
+        if build_date == fairphone_build:
+            build_index = build_rows.index(build_row)
+            break
 
-    latest_recovery_image_link = latest_build_row.find('a')[2].attrs['href']
-    latest_recovery_checksum_link = latest_build_row.find('a')[3].attrs['href']
+    logger.info(f'Found recovery file for: {build_date}')
+
+    latest_recovery_image_link = build_rows[build_index].find('a')[2].attrs['href']
+    latest_recovery_checksum_link = build_rows[build_index].find('a')[3].attrs['href']
 
     return(latest_recovery_image_link, latest_recovery_checksum_link)
 
@@ -299,6 +304,8 @@ def patch_file_cleanup(file_suffix, recovery_file, fairphone_build_date):
     while normal_boot_mode == False:
         sleep(20)
         normal_boot_mode = check_if_in_normal_boot_mode()
+
+    sleep(20)
 
     magisk_file = f'/storage/emulated/0/Download/magisk_patched-{file_suffix}.img'
     recovery_file_full = f'/storage/emulated/0/Download/{recovery_file}'
